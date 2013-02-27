@@ -15,11 +15,20 @@ def parseLine(line)
 end
 
 def checkAttempts()
+	sameAttempts = []
 	$attempts.each do |a|
-		puts a.ip
+		$attempts.each do |b|
+			if a.ip.eql? b.ip
+				sameAttempts.push(b)
+			end
+		end
+	end
+	sameAttempts.each do |a|
+		puts a.time
 	end
 end
 
+##BEGIN LOGIC
 #open file
 begin
 	file = File.new(ARGV[0], "r")
