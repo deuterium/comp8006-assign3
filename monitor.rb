@@ -4,13 +4,19 @@ load "attempt.rb"
 
 puts "This is a test ruby script: " + __FILE__
 
+$attempts = []
+
 #Parse line for authentication
 def parseLine(line)
 	if line.include? "Failed password"
-		puts line
 		lineArray = line.split(pattern=" ")
-		o = Attempt.new(lineArray[0], lineArray[1], lineArray[2], lineArray[10])
-		puts o.ip
+		$attempts.push(Attempt.new(lineArray[0], lineArray[1], lineArray[2], lineArray[10]))
+	end
+end
+
+def checkAttempts()
+	$attempts.each do |a|
+		puts a.ip
 	end
 end
 
@@ -27,3 +33,4 @@ rescue => err
 	err
 end
 
+checkAttempts
