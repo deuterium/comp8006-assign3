@@ -1,5 +1,22 @@
 #!/usr/bin/ruby
+#Comments and stuff
 #
+#
+#
+#
+#User Configuration Section
+
+#number of attempts in a 30 minute period of time before an IP is blocked
+numAttempts = 3
+
+#time to ban IP for
+banTime = 60
+
+#
+#
+#
+#
+#IMPLEMENTATION DO NOT MODIFY
 load "attempt.rb"
 
 puts "This is a test ruby script: " + __FILE__
@@ -19,13 +36,34 @@ def checkAttempts()
 	$attempts.each do |a|
 		$attempts.each do |b|
 			if a.ip.eql? b.ip
-				sameAttempts.push(b)
+				sameAttempts.push(a)
+				break
 			end
 		end
 	end
 	sameAttempts.each do |a|
-		puts a.time
+		puts toTime(a)
 	end
+end
+
+def monthToDig(month)
+	case month
+	when "Jan"
+		return 1
+	when "Feb"
+		return 2
+	when "Mar"
+		return 3
+	when "Apr"
+		return 4
+	end
+	#etc.....
+end
+
+def toTime(a)
+	hms = a.time.split(pattern=":")
+	time = Time.new(Time.now.year, monthToDig(a.month), a.day.to_i, hms[0].to_i, hms[1].to_i, hms[2].to_i)
+	return time
 end
 
 ##BEGIN LOGIC
