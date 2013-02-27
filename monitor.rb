@@ -31,6 +31,7 @@ def parseLine(line)
 	end
 end
 
+#write comments here !!!!!!!!!!!!!!!!!! :)
 def checkAttempts()
 	sameAttempts = []
 	$attempts.each do |a|
@@ -42,10 +43,12 @@ def checkAttempts()
 		end
 	end
 	sameAttempts.each do |a|
-		puts toTime(a)
+		#compare times for stuff here, if close, new array? :)
+		#new array length compared to numOfAttempts and then iptables rule
 	end
 end
 
+#Converts shorthand month strings to numerical numbers
 def monthToDig(month)
 	case month
 	when "Jan"
@@ -60,6 +63,7 @@ def monthToDig(month)
 	#etc.....
 end
 
+#Returns a time object constructed from an attempt object's local variables
 def toTime(a)
 	hms = a.time.split(pattern=":")
 	time = Time.new(Time.now.year, monthToDig(a.month), a.day.to_i, hms[0].to_i, hms[1].to_i, hms[2].to_i)

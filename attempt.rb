@@ -1,3 +1,4 @@
+#Object used for collecting valuable information from parse log lines
 class Attempt
 	def initialize(month, day, time, ip)
 	  @month	= month
