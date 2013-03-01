@@ -1,70 +1,79 @@
 #!/usr/bin/ruby
-#Comments and stuff
-#
-#
-#
-#
-#User Configuration Section
+#Chris Wood - A00741285 - COMP8006 - Assignment 3
+#Monitor script to detect failed SSH authentication attempts and,
+#if nessecary, block the IP address using Netfilter
 
-#number of attempts in a 30 minute period of time before an IP is blocked
-numAttempts = 3
+############################
+#User Configuration Section#     
+############################
+
+#number of attempts before an IP is banned in a time range(below) 
+$numAttempts = 3
 
 #time to ban IP for in minutes
-@banTime = 60
+$banTime = 60
 
-#
-#
-#
-#
-#IMPLEMENTATION DO NOT MODIFY
+##
+##
+##############################
+##############################
+#IMPLEMENTATION DO NOT MODIFY#
+##############################
 load "attempt.rb"
-
-puts "This is a test ruby script: " + __FILE__
 
 $attempts = []
 
-#Parse line for authentication
+#Parse line for authentication failures, attempts are turned in to objects
 def parseLine(line)
 	if line.include? "Failed password" and !line.include? "invalid user"
 		lineArray = line.split(pattern=" ")
 		$attempts.push(Attempt.new(lineArray[0], lineArray[1], lineArray[2], lineArray[10]))	
+	#noticed someone was brute forcing my ssh while I left it on overnight, noticed having
+	#an invalid user changed the wording in /var/log/secure and had to change to this logic
 	elsif line.include? "Failed password" and line.include? "invalid user"
 		lineArray = line.split(pattern=" ")
 		$attempts.push(Attempt.new(lineArray[0], lineArray[1], lineArray[2], lineArray[12]))
 	end
 end
 
-#write comments here !!!!!!!!!!!!!!!!!! :)
+#Basically all the magic happens here, other than loading the file and parsing log
 def checkAttempts()
 	sameAttempts = []
+	
+	#look to simillar IPs.....
 	$attempts.each do |a|
 		$attempts.each do |b|
 			if a.ip.eql? b.ip
+				#record if the same
 				sameAttempts.push(a)
 				break
 			end
 		end
 	end
 	
-	@banTime = @banTime * 60
+	$banTime = $banTime * 60
 	banStack = []
 
+	#of attempts with same IP, compare sequential attempts
 	sameAttempts.each do |a|
-		banStack.push(a)
-puts a.ip
-		if banStack.length == 3
+		if banStack.empty?
+			banStack.push(a)
+		
+		elsif banStack[banStack.length - 1].ip != a.ip
+			banStack.clear
+			banStack.push(a)
+		else
+			banStack.push(a)
+		end
+		if banStack.length == $numAttempts
 			t = banStack[2].to_time - banStack[0].to_time
-puts t	
-			if t <= @banTime
-				puts "banned"
-				puts a.ip
+			#if time difference is in user defined period, ban
+			if t <= $banTime
+				puts "banned: " + a.ip
+				#this is where netfliter block needs to go
 			end
 			banStack.shift
 		end
-				
-
-#compare times for stuff here, if close, new array? :)
-		#new array length compared to numOfAttempts and then iptables rule
 	end
 end
 
