@@ -11,7 +11,7 @@
 $numAttempts = 3
 
 #time to ban IP for in minutes
-$banTime = 60
+$banTime = 15
 
 #range of time to ban attempts from
 #(period of time for numOfAttempts to apply)
@@ -83,8 +83,39 @@ def checkAttempts()
 	end
 end
 
+def removeLogLine(line)
+	line_arr = File.readlines("ban_log")
+	line_arr.delete_at(line_arr.index{ |n| n.include? line })
+puts line_arr.to_s
+	File.open("ban_log", "w") do |f|
+		line_arr.each{ |l| f.puts(l) }
+	end
+end
+
+def unban(ip)
+
+end
+
 def checkLog
 	puts "Checking log."
+	begin
+		file = File.new("ban_log", "r")
+		while (line = file.gets)
+			line = line.split(pattern=" ")
+			t = Time.now.to_i - line[1].to_i 
+			if t > ($banTime * 60)    #think shit is broken here
+				unban(line[0])
+				puts "ip unbanned: " + line[0]
+				line = line[0] + " " + line[1]
+				removeLogLine(line)
+			end
+		end
+		file.close
+	rescue => err
+		puts "Exception: #{err}"
+		puts "does a log file exist?"
+		err
+	end
 end
 
 #open file
