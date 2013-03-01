@@ -13,6 +13,10 @@ $numAttempts = 3
 #time to ban IP for in minutes
 $banTime = 60
 
+#range of time to ban attempts from
+#(period of time for numOfAttempts to apply)
+$banRange = 60
+
 ##
 ##
 ##############################
@@ -51,12 +55,12 @@ def checkAttempts()
 		end
 	end
 	
-	$banTime = $banTime * 60
+	$banRange = $banRange * 60
 	banStack = []
 
 	#of attempts with same IP, compare sequential attempts
 	sameAttempts.each do |a|
-#PROBLEM: if ip switches, banstack is cleared......
+#PROBLEM: if ip switches, banstack is cleared.....better than false bans?
 		if banStack.empty?
 			banStack.push(a)
 		elsif banStack[banStack.length - 1].ip != a.ip
@@ -68,16 +72,21 @@ def checkAttempts()
 		if banStack.length == $numAttempts
 			t = banStack[2].to_time - banStack[0].to_time
 			#if time difference is in user defined period, ban
-			if t <= $banTime
+			if t <= $banRange
+				#system "iptables -A INPUT -s #{a.ip} -j DROP"
 				puts "banned: " + a.ip
-				#this is where netfliter block needs to go
+				banme = a.ip + " " + Time.now.to_i.to_s
+				system "echo '#{banme}' >> ban_log"
 			end
 			banStack.shift
 		end
 	end
 end
 
-##BEGIN LOGIC
+def checkLog
+	puts "Checking log."
+end
+
 #open file
 begin
 	file = File.new(ARGV[0], "r")
@@ -91,4 +100,6 @@ rescue => err
 	err
 end
 
+#run magic
 checkAttempts
+checkLog
