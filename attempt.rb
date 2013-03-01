@@ -38,7 +38,7 @@ class Attempt
 	def to_time
         	hms = @time.split(pattern=":")
         	t = Time.new(Time.now.year, monthToDig(@month), @day.to_i, hms[0].to_i, hms[1].to_i, hms[2].to_i)
-        	return t
+        	return t.to_i
 	end
 end
 

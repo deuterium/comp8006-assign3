@@ -9,8 +9,8 @@
 #number of attempts in a 30 minute period of time before an IP is blocked
 numAttempts = 3
 
-#time to ban IP for
-banTime = 60
+#time to ban IP for in minutes
+@banTime = 60
 
 #
 #
@@ -45,11 +45,26 @@ def checkAttempts()
 			end
 		end
 	end
+	
+	@banTime = @banTime * 60
+	banStack = []
+
 	sameAttempts.each do |a|
-		#compare times for stuff here, if close, new array? :)
+		banStack.push(a)
+puts a.ip
+		if banStack.length == 3
+			t = banStack[2].to_time - banStack[0].to_time
+puts t	
+			if t <= @banTime
+				puts "banned"
+				puts a.ip
+			end
+			banStack.shift
+		end
+				
+
+#compare times for stuff here, if close, new array? :)
 		#new array length compared to numOfAttempts and then iptables rule
-		puts a.to_time
-		print a.ip + ": "
 	end
 end
 
