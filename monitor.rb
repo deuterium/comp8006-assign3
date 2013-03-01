@@ -56,9 +56,9 @@ def checkAttempts()
 
 	#of attempts with same IP, compare sequential attempts
 	sameAttempts.each do |a|
+#PROBLEM: if ip switches, banstack is cleared......
 		if banStack.empty?
 			banStack.push(a)
-		
 		elsif banStack[banStack.length - 1].ip != a.ip
 			banStack.clear
 			banStack.push(a)
