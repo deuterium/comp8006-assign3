@@ -114,7 +114,8 @@ def checkLog
 		file.close
 	rescue => err
 		puts "Exception: #{err}"
-		puts "does a log file exist?"
+		puts "does a log file exist? ...creating one"
+		File.open("ban_log", "w") do |f| end
 		err
 	end
 end
