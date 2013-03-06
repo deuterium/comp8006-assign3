@@ -61,6 +61,7 @@ def checkAttempts()
 	#of attempts with same IP, compare sequential attempts
 	sameAttempts.each do |a|
 #PROBLEM: if ip switches, banstack is cleared.....better than false bans?
+#resolution.....use a hash based on IP?
 		if banStack.empty?
 			banStack.push(a)
 		elsif banStack[banStack.length - 1].ip != a.ip
