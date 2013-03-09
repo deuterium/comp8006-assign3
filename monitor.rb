@@ -57,11 +57,13 @@ def checkAttempts()
 	
 	$banRange = $banRange * 60
 	banStack = []
+  badIP = Hash.new(0)
 
 	#of attempts with same IP, compare sequential attempts
 	sameAttempts.each do |a|
 #PROBLEM: if ip switches, banstack is cleared.....better than false bans?
 #resolution.....use a hash based on IP?
+    #badIP[a] = badIP[a].to_i + 1
 		if banStack.empty?
 			banStack.push(a)
 		elsif banStack[banStack.length - 1].ip != a.ip
@@ -74,14 +76,15 @@ def checkAttempts()
 			t = banStack[2].to_time - banStack[0].to_time
 			#if time difference is in user defined period, ban
 			if t <= $banRange
-				#system "iptables -A INPUT -s #{a.ip} -j DROP"
+				system "iptables -A INPUT -s #{a.ip} -j DROP"
 				puts "banned: " + a.ip
-				banme = a.ip + " " + Time.now.to_i.to_s
-				system "echo '#{banme}' >> ban_log"
+				#banme = a.ip + " " + Time.now.to_i.to_s
+				#system "echo '#{banme}' >> ban_log"
 			end
 			banStack.shift
 		end
 	end
+  #badIP.each {|key, value| puts "#{key.ip } value : #{value}"}
 end
 
 def removeLogLine(line)
@@ -104,7 +107,7 @@ def checkLog
 		while (line = file.gets)
 			line = line.split(pattern=" ")
 			t = Time.now.to_i - line[1].to_i 
-			if t > ($banTime * 60)    #think shit is broken here
+			if t > ($banTime * 60)    #think is broken here
 				unban(line[0])
 				puts "ip unbanned: " + line[0]
 				line = line[0] + " " + line[1]
@@ -135,4 +138,4 @@ end
 
 #run magic
 checkAttempts
-checkLog
+#checkLog
